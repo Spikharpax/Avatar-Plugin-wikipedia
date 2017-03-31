@@ -87,11 +87,12 @@ Pour un meilleur dialogue, la définition wiki est coupée par des textes de lon
 
 
 ## Les commandes
-Toutes les syntaxes de phrases qui comprennent ces mots peuvent être utilisées. Ce ne sont pas des règles fixes.
 
 Les règles sont définies dans le tableau de syntaxes `wiki`
 
 Une seule syntaxe est définie. La règles doit inclure le mot **wikipedia** 
+
+Toutes les syntaxes de phrases qui comprennent ce mot peuvent être utilisées. Il n'y a pas de règles fixes.
 
 Quelques exemples possibles:
 - Cherche dans wikipedia qui est Albert Einstein
