@@ -47,7 +47,7 @@ exports.default = function (state) {
 	var sentence = '';
 	// Filtre les termes indésirables
 	terms.map(function (term, index) {
-	  if (index > action_index) {
+	  if (index > action_index) {  
 		if (terms[index].tag !== PRONOUN && terms[index].tag !== QUESTION && terms[index].tag !== COPULA && terms[index].tag !== CONJUNCTION && terms[index].tag !== PREPOSITION && terms[index].tag !== DETERMINER) {
 			if ((terms[index].tag !== NOUN && terms[index].tag !== EXPRESSION) || (terms[index].tag === NOUN && term.text != 'information') || (terms[index].tag === EXPRESSION && term.text != 'please')) {
 				if (!terms[index + 1]) { 
@@ -61,6 +61,10 @@ exports.default = function (state) {
 	
 	// test si on a récupéré quelque chose
 	if (sentence) {
+		
+	  // un dernier filtrage, certaines fois il peut arriver que 2 mots soit vu comme un seul, la traduction n'est pas parfaite.
+	  // par exemple "is bowling" est vu comme un verbe (1 seul mot) et si on cherche "bowling", c'est embetant...
+	  sentence = sentence.replace('is ', '');
 		
 	  if (state.debug) info('ActionWikipedia'.bold.yellow, 'sentence:'.bold, sentence);
 	  
