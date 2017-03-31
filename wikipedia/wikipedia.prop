@@ -5,7 +5,7 @@
 			"exemple": "wikipedia Albert Enstein || cherche sur wikipedia des infos sur Albert Enstein || tu peux rechercher sur wikipedia des informations sur Albert Enstein s'il te plait",
 			"sentence_lenght" : 300,
 			"rules" : {
-				"wiki" : ["wikipedia * [Conjunction]?"]
+				"wiki" : ["wikipedia"]
 			},
 			"next_askme" : "je continue ?|encore ?|plusse ?",
 			"next_answer" : {  
