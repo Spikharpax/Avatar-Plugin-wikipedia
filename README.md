@@ -100,7 +100,7 @@ Quelques exemples possibles:
 - Recherche dans wipidepia qui est Louis XVI
 - Fais une recherche dans wikipedia sur apollo 11 s'il te plait
 - Recherche dans wikipedia des informations sur la coupe du monde de football
-
+- On veux savoir sur wikipedia c'est qui Michel Platini
 
 Si Avatar ne trouve pas des informations dans wikipedia, il vous le signifie.
 
