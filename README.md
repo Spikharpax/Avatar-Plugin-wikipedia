@@ -79,7 +79,7 @@ exports.intent = function () {
 La configuration du plugin se fait dans le fichier `Avatar-Serveur/plugins/wikipedia/wikipedia.prop`
 
 ### Longueur des tts
-Pour un meilleur dialogue, la définition wiki est coupée par des textes de longueurs définis dans la propriété `sentence_lenght` (par défaut 300 caractères).
+Pour un meilleur dialogue, la définition wiki est coupée par des textes d'une longueur définie dans la propriété `sentence_lenght` (par défaut 300 caractères).
 
 ```xml
 "sentence_lenght" : 300,
@@ -96,7 +96,7 @@ Toutes les syntaxes de phrases qui comprennent ce mot peuvent être utilisées. 
 
 Quelques exemples possibles:
 - Cherche dans wikipedia qui est Albert Einstein
-- Cherche dans wikipedia des informations sur l'univers
+- Cherche dans wikipedia des infos sur l'univers
 - Tu peux regarder dans wikipedia ce que c'est que le temps 
 - Recherche dans wipidepia qui est Louis XVI
 - Fais une recherche dans wikipedia sur apollo 11 s'il te plait
@@ -112,7 +112,7 @@ Dites alors:
 - ["répete","encore"] =>  Repête la partie du texte vocalisée.
 - ["non c'est bon","non merci","merci"] =>  Stop la lecture.
 
-Toutes ces règles sont définies dans le fichier de propriétés du plugin. Vous pouvez les modifier ou en ajouter.
+Toutes ces réponses sont définies dans le fichier de propriétés du plugin. Vous pouvez les modifier ou en ajouter.
 
    
 ## Versions
