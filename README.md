@@ -102,6 +102,11 @@ Quelques exemples possibles:
 - Fais une recherche dans wikipedia sur apollo 11 s'il te plait
 - Recherche dans wikipedia des informations sur la coupe du monde de football
 - On veux savoir sur wikipedia c'est qui Michel Platini
+- C'est quoi pour Wikipédia le billard
+- Fais une recherche dans Wikipédia sur le billard américain
+- Tu peux faire une recherche dans Wikipédia pour savoir qui est john Wayne s'il te plait
+- Cherche dans Wikipédia la définition du cinéma
+- Recherche dans Wikipédia des informations sur le Brésil
 
 Si Avatar ne trouve pas des informations dans wikipedia, il vous le signifie.
 
@@ -116,5 +121,8 @@ Toutes ces réponses sont définies dans le fichier de propriétés du plugin. V
 
    
 ## Versions
+Version 1.1 (15-04-2017)
+- Petite mise à jour, amélioration de la recherche
+
 Version 1.0 
 - Version Released

@@ -29,6 +29,7 @@ var QUESTION = 'Question';
 var PRONOUN = 'Pronoun';
 var NOUN = 'Noun';
 var EXPRESSION = 'Expression';
+var INFINITIVE = 'Infinitive';
 
 exports.default = function (state) {
 
@@ -48,30 +49,44 @@ exports.default = function (state) {
 	// Filtre les termes indésirables
 	terms.map(function (term, index) {
 	  if (index > action_index) {  
-		if (terms[index].tag !== PRONOUN && terms[index].tag !== QUESTION && terms[index].tag !== COPULA && terms[index].tag !== CONJUNCTION && terms[index].tag !== PREPOSITION && terms[index].tag !== DETERMINER) {
-			if ((terms[index].tag !== NOUN && terms[index].tag !== EXPRESSION) || (terms[index].tag === NOUN && term.text != 'information') || (terms[index].tag === EXPRESSION && term.text != 'please')) {
+	    if (terms[index].tag !== INFINITIVE && terms[index].tag !== PRONOUN && terms[index].tag !== QUESTION && terms[index].tag !== COPULA && terms[index].tag !== CONJUNCTION && terms[index].tag !== PREPOSITION && terms[index].tag !== DETERMINER) {
+			//info ('terms[index].tag', terms[index].tag)
+			//info ('term', term.text)
+			if ((terms[index].tag !== NOUN && terms[index].tag !== EXPRESSION) || (terms[index].tag === NOUN && (term.text != 'definition' && term.text != 'information')) || (terms[index].tag === EXPRESSION && term.text != 'please')) {
 				if (!terms[index + 1]) { 
 					sentence += term.text;
 				} else
 					sentence += term.text + ' ';
-			}
+			} 
 		} 
 	  }
 	});
 	
+	
 	// test si on a récupéré quelque chose
 	if (sentence) {
 		
-	  // un dernier filtrage, certaines fois il peut arriver que 2 mots soit vu comme un seul, la traduction n'est pas parfaite.
-	  // par exemple "is bowling" est vu comme un verbe (1 seul mot) et si on cherche "bowling", c'est embetant...
-	  sentence = sentence.replace('is ', '');
-		
-	  if (state.debug) info('ActionWikipedia'.bold.yellow, 'sentence:'.bold, sentence);
+	  // un filtrage, certaines fois il peut arriver que 2 mots soit vu comme un seul, la traduction n'est pas parfaite.
+	  // par exemple " is bowling" est vu comme un verbe (1 seul mot) et si on cherche "bowling", c'est embetant...
+	  action_index = sentence.indexOf('is ');
+	  if (action_index != -1) {
+		  if (action_index == 0)
+			 sentence = sentence.replace('is ', ''); 
+		 // pour la forme
+		 sentence = sentence.replace(' is ', '');
+	  }
 	  
 	  // re-traduit en francais pour le wiki en francais
 	  (0, _googleTranslateApi2.default)(sentence, { from: 'en', to: 'fr' }).then(function (response) {
-		  
-			sentence = response.text;
+		    
+			// On filter en francais, c'est chiant en francais tous ces pronoms inutiles...
+			sentence = response.text.replace('null', '').replace('?', '');
+			var tblSentence = sentence.split(' ');
+			if (tblSentence && (tblSentence[0].toLowerCase() == 'le' || tblSentence[0].toLowerCase() == 'la' || tblSentence[0].toLowerCase() == 'les')) 
+				sentence = sentence.replace(tblSentence[0], '');
+			
+			// Affiche ce qui doit être recherché
+			if (state.debug) info('ActionWikipedia'.bold.yellow, 'sentence:'.bold, sentence);
 			
 			// recherche sur wikipedia
 			_wtf_wikipedia2.default.from_api(sentence, 'fr', function (response) {

@@ -13,9 +13,9 @@ exports.default = function (state, actions) {
 	
 	if (state.isIntent) return (0, _helpers.resolve)(state);
 	
-	var match = (0, _helpers.syntax)(state.sentence, Config.modules.wikipedia.rules.wiki); 
+	var tokens = (0, _helpers.intersect)(Config.modules.wikipedia.rules.wiki, state.tokens);
 
-	if (match) {
+	if (tokens) {
 		if (state.debug) info('IntentKnowledge'.bold.green, 'syntax:', 'true'.green );
 		state.isIntent = true;
 		return (0, _helpers.factoryActions)(state, actions);
