@@ -62,7 +62,6 @@ exports.default = function (state) {
 	  }
 	});
 	
-	
 	// test si on a récupéré quelque chose
 	if (sentence) {
 		
@@ -82,7 +81,7 @@ exports.default = function (state) {
 			// On filter en francais, c'est chiant en francais tous ces pronoms inutiles...
 			sentence = response.text.replace('null', '').replace('?', '');
 			var tblSentence = sentence.split(' ');
-			if (tblSentence && (tblSentence[0].toLowerCase() == 'le' || tblSentence[0].toLowerCase() == 'la' || tblSentence[0].toLowerCase() == 'les')) 
+			if (tblSentence && (tblSentence[0].toLowerCase() == 'le' || tblSentence[0].toLowerCase() == 'la' || tblSentence[0].toLowerCase() == 'les' || tblSentence[0].toLowerCase() == 'des' || tblSentence[0].toLowerCase() == 'de')) 
 				sentence = sentence.replace(tblSentence[0], '');
 			
 			// Affiche ce qui doit être recherché
@@ -91,6 +90,13 @@ exports.default = function (state) {
 			// recherche sur wikipedia
 			_wtf_wikipedia2.default.from_api(sentence, 'fr', function (response) {
 				var wiki = _wtf_wikipedia2.default.plaintext(response);
+				// Filtre sur les caractères indésirables
+				wiki = wiki.replace(/\[/g, "")
+							.replace(/\]/g, "")
+							.replace(/\{/g, "")
+							.replace(/\}/g, "")
+							.replace(/\' /g, " "); 
+				
 				// Envoi au plugin
 				setTimeout(function(){	
 					state.action = {

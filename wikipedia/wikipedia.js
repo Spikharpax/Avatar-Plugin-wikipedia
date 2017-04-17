@@ -1,3 +1,5 @@
+var fs = require('fs-extra');
+
 require('colors');
 
 
@@ -51,7 +53,7 @@ function knowledge(client, sentence, wiki) {
 		}
 		
 		// Envoi du tableau au speak 
-		wiki_speak(client, tblwiki, 0 );
+		wiki_speak(client, tblwiki, 0, sentence,  wiki);
 		
 	} else
 		Avatar.speak("Je ne suis pas arrivé a récupérer des info" + (sentence ? (" sur " + sentence) : ''), client, function(){
@@ -61,7 +63,7 @@ function knowledge(client, sentence, wiki) {
 }
 
 
-function wiki_speak (client, tblwiki, pos ) {
+function wiki_speak (client, tblwiki, pos, sentence, wiki ) {
 	
 	if (pos == tblwiki.length) {
 		return Avatar.Speech.end(client);
@@ -81,17 +83,25 @@ function wiki_speak (client, tblwiki, pos ) {
 			switch (answer) {
 				case 'again' : // Recommence...
 					end(client);
-					wiki_speak (client, tblwiki, pos );
+					wiki_speak (client, tblwiki, pos, sentence, wiki);
 					break;
 				case 'yes' :   // on continue
 					end(client);
-					wiki_speak (client, tblwiki, ++pos );
+					wiki_speak (client, tblwiki, ++pos, sentence, wiki);
+					break;
+				case 'save' : // Sauvegarde
+					end(client);
+					fs.ensureDirSync(__dirname + '/wikidoc/');
+					fs.writeFileSync(__dirname + '/wikidoc/' + sentence+'.txt',wiki, 'utf8');
+					Avatar.speak('Document sur ' + sentence + ' sauvegardé', client, function(){
+						wiki_speak (client, tblwiki, ++pos, sentence, wiki);
+					});
 					break;
 				default:
 				case 'stop' :  // on arrete
 					Avatar.speak('d\'accord', client, function(){
 						end(client,true);
-					})
+					});
 			}
 		});
 	}); 
