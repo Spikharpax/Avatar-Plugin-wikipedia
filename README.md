@@ -125,6 +125,9 @@ Toutes ces réponses sont définies dans le fichier de propriétés du plugin. V
 
    
 ## Versions
+Version 1.3 (22-04-2017)
+- Petite mise à jour, amélioration de la recherche
+
 Version 1.2 (17-04-2017)
 - Amélioration du à la correction du modules wtf_wikipedia
 	- Copiez le fichier modules wtf_wikipedia/src/index.js depuis Avatar Serveur V 0.1.3 (17-04-2017) et + 

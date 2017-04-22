@@ -4,122 +4,97 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _nlp_compromise = require('nlp_compromise');
-
-var _nlp_compromise2 = _interopRequireDefault(_nlp_compromise);
 
 var _wtf_wikipedia = require('wtf_wikipedia');
 
 var _wtf_wikipedia2 = _interopRequireDefault(_wtf_wikipedia);
 
-var _googleTranslateApi = require('google-translate-api');
-
-var _googleTranslateApi2 = _interopRequireDefault(_googleTranslateApi);
-
-var _helpers = require('../../node_modules/ava-ia/lib/helpers');
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// -- Internal
-var CONJUNCTION = 'Conjunction';
-var PREPOSITION = 'Preposition';
-var DETERMINER = 'Determiner';
-var COPULA = 'Copula';
-var QUESTION = 'Question';
-var PRONOUN = 'Pronoun';
-var NOUN = 'Noun';
-var EXPRESSION = 'Expression';
-var INFINITIVE = 'Infinitive';
+var _ = require('underscore');
+
+// Ignoré une fois dans TERM
+var TERM = ['wikipédia', 'la', 'qu\'est-ce', 'le', 'les', 'des', 'de', 'du', 'sur', 'ce', 'que', 'qui', 'info', 'définitions', 'définition', 'infos', 'l\'information', 'information', 'informations', 'savoir', 'pour', 'c\'est', 'est', 'sur', 's\'il', 'te', 'plaît', 'plait'];
+// Toujours ignoré dans NOTERM
+var NOTERM = ['la', 'ce', 'que', 'qu\'est-ce', 'qui', 'info', 'définitions', 'savoir', 'pour', 'c\'est', 'est', 's\'il', 'te', 'plaît', 'plait'];
+// Non ignoré si un term est déjà pris, ex: la défintion de la revue du cinéma
+var IGNORETERM = ['du', 'de', 'des'];
+
 
 exports.default = function (state) {
 
   return new Promise(function (resolve, reject) {
 	
-	// Coupe à partir de 'wikipedia'
-	var action_index = state.tokens.indexOf('wikipedia');
-	var terms = _nlp_compromise2.default.text(state.sentence).sentences[0].terms;
-	if (action_index == -1) {
-		terms.map(function (term, index) {
-			if (term.text.toLowerCase().indexOf('wikipedia') != -1)
-				action_index = index;
-		})
+	var TAKEN = [];  
+	for (var i in TERM) {
+		TAKEN.push(0);
 	}
 	
 	var sentence = '';
-	// Filtre les termes indésirables
+	var indexWiki, pos, take;
+	var terms = state.rawSentence.split(' ');
 	terms.map(function (term, index) {
-	  if (index > action_index) {  
-	    if (terms[index].tag !== INFINITIVE && terms[index].tag !== PRONOUN && terms[index].tag !== QUESTION && terms[index].tag !== COPULA && terms[index].tag !== CONJUNCTION && terms[index].tag !== PREPOSITION && terms[index].tag !== DETERMINER) {
-			//info ('terms[index].tag', terms[index].tag)
-			//info ('term', term.text)
-			if ((terms[index].tag !== NOUN && terms[index].tag !== EXPRESSION) || (terms[index].tag === NOUN && (term.text != 'definition' && term.text != 'information')) || (terms[index].tag === EXPRESSION && term.text != 'please')) {
-				if (!terms[index + 1]) { 
-					sentence += term.text;
-				} else
-					sentence += term.text + ' ';
+		
+		if (!indexWiki && term.toLowerCase() === 'wikipédia') indexWiki = true;	
+		
+		if (indexWiki) {
+			take = false;
+			pos = _.indexOf(TERM, term.toLowerCase());
+			if (pos != -1) {
+				if (TAKEN[pos] == 0) {
+					if (sentence && sentence.length > 0 && _.indexOf(IGNORETERM, term.toLowerCase()) != -1) {
+						take = true;
+					} else {
+						TAKEN[pos] = 1;
+					}
+				} else {
+					if (_.indexOf(NOTERM, term.toLowerCase()) == -1)
+						take = true;
+				} 
+			} else {
+				take = true;
+			}	
+			if (take) {
+				sentence += term;
+				if (terms[index + 1]) sentence += ' ';
 			} 
-		} 
-	  }
+		}
 	});
 	
 	// test si on a récupéré quelque chose
 	if (sentence) {
 		
-	  // un filtrage, certaines fois il peut arriver que 2 mots soit vu comme un seul, la traduction n'est pas parfaite.
-	  // par exemple " is bowling" est vu comme un verbe (1 seul mot) et si on cherche "bowling", c'est embetant...
-	  action_index = sentence.indexOf('is ');
-	  if (action_index != -1) {
-		  if (action_index == 0)
-			 sentence = sentence.replace('is ', ''); 
-		 // pour la forme
-		 sentence = sentence.replace(' is ', '');
-	  }
-	  
-	  // re-traduit en francais pour le wiki en francais
-	  (0, _googleTranslateApi2.default)(sentence, { from: 'en', to: 'fr' }).then(function (response) {
-		    
-			// On filter en francais, c'est chiant en francais tous ces pronoms inutiles...
-			sentence = response.text.replace('null', '').replace('?', '');
-			var tblSentence = sentence.split(' ');
-			if (tblSentence && (tblSentence[0].toLowerCase() == 'le' || tblSentence[0].toLowerCase() == 'la' || tblSentence[0].toLowerCase() == 'les' || tblSentence[0].toLowerCase() == 'des' || tblSentence[0].toLowerCase() == 'de')) 
-				sentence = sentence.replace(tblSentence[0], '');
+		sentence = sentence.replace('l\'','');
+		sentence = sentence.replace(sentence[0], sentence[0].toUpperCase());
+		
+		// Affiche ce qui doit être recherché
+		if (state.debug) info('ActionWikipedia'.bold.yellow, 'sentence:'.bold, sentence);
+		
+		// recherche sur wikipedia
+		_wtf_wikipedia2.default.from_api(sentence, 'fr', function (response) {
+			var wiki = _wtf_wikipedia2.default.plaintext(response);
+			// Filtre sur les caractères indésirables
+			wiki = wiki.replace(/\[/g, "")
+						.replace(/\]/g, "")
+						.replace(/\{/g, "")
+						.replace(/\}/g, "")
+						.replace(/\' /g, " ")
+						.replace(/\#/g, ". ")
+						.replace(/\|/g, ". ");						
 			
-			// Affiche ce qui doit être recherché
-			if (state.debug) info('ActionWikipedia'.bold.yellow, 'sentence:'.bold, sentence);
-			
-			// recherche sur wikipedia
-			_wtf_wikipedia2.default.from_api(sentence, 'fr', function (response) {
-				var wiki = _wtf_wikipedia2.default.plaintext(response);
-				// Filtre sur les caractères indésirables
-				wiki = wiki.replace(/\[/g, "")
-							.replace(/\]/g, "")
-							.replace(/\{/g, "")
-							.replace(/\}/g, "")
-							.replace(/\' /g, " "); 
-				
-				// Envoi au plugin
-				setTimeout(function(){	
-					state.action = {
-					  module: 'wikipedia',
-					  command: 'wiki',
-					  sentence: sentence,
-					  info : wiki
-					};
-				
-					resolve(state);
-				}, 500);  
-			});
-		}).catch(function (error) {
-			  // Envoi au plugin l'erreur
-			  setTimeout(function(){
+			// Envoi au plugin
+			setTimeout(function(){	
 				state.action = {
-					module: 'wikipedia',
-					command: 'error',
-					error: 'je suis désolé, je n\'ai pas compris ce qu\'il faut que je recherche'
+				  module: 'wikipedia',
+				  command: 'wiki',
+				  sentence: sentence,
+				  info : wiki
 				};
+			
 				resolve(state);
 			}, 500);  
 		});
+		
     } else {
 		setTimeout(function(){
 			 // Envoi au plugin l'erreur
