@@ -5,80 +5,12 @@ Ce plugin est un add-on pour le framework [Avatar](https://github.com/Spikharpax
 
 Demandez ce que vous voulez à Avatar, il a une connaissance sur tout... Merci Wikipedia !! ;-D
 
-Ce plugin est fait à titre d'exemple, n'hésitez pas à le modifier pour l'améliorer. Enjoy
-
-
 ## Installation
 
 - Dézippez le fichier `Avatar-Plugin-wikipedia-Master.zip` dans un répertoire temporaire
 - Copiez le répertoire `wikipedia` dans le répertoire `Avatar-Serveur/plugins`
-- Copiez le fichier `intents/intent.knowledge.js`dans le répertoire `Avatar-Serveur/ia/intents/`
-- Copiez le fichier `actions/action.wikipedia` dans le répertoire `Avatar-Serveur/ia/actions/`
-- Editez le fichier `Avatar-Serveur/ia/actions/index.js`, allez à la fin du fichier et juste avant `function _interopRequireDefault(obj)` ajoutez les lignes suivantes:
-
-```javascript
-var _actionWikipedia = require('./action.wikipedia');
-
-Object.defineProperty(exports, 'wikipedia', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_actionWikipedia).default;
-  }
-});
-
-// Fin du fichier...
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-```
-
-- Editez le fichier `Avatar-Serveur/ia/intents/index.js`, allez à la fin du fichier et juste avant `function _interopRequireDefault(obj)` ajoutez les lignes suivantes:
-
-```javascript
-var _intentKnowledge = require('./intent.knowledge');
-
-Object.defineProperty(exports, 'knowledge', {
-  enumerable: true,
-  get: function get() {
-    return _interopRequireDefault(_intentKnowledge).default;
-  }
-});
-
-// Fin du fichier...
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-```
-
-- Editez le fichier `Avatar-Serveur/ia/index.js`
-	- Ajoutez dans l'import des intents, l'intention `knowledge`
-	- Ajoutez dans l'import des actions, l'action `wikipedia`
-	- Ajoutez dans la fonction export.intent(), l'association de l'intention-action
-
-```javascript
-import { knowledge, tvChannels, tvActions, music, weather, hour,  blague, manageAvatar, shoppingList, translate, lastAction, intentEnd} from './intents';
-import { wikipedia, freeTV, freeRules, Sonos, forecastMsn, forecastYahoo, worldHour, jokeOfDay, avatarRules, shopping, translator, backupAction, actionEnd} from './actions';
-
-
-exports.intent = function () {
-
-	// Configure the intents
-	ava
-	 .intent(translate, translator)
-	 // Déclaration wiki CI-DESSOUS !
-	 .intent(knowledge, wikipedia)
-	 .intent(hour, worldHour)
-	 .intent(weather, [forecastYahoo, forecastMsn])
-	 .intent(music, Sonos)
-	 .intent(blague, jokeOfDay)
-	 .intent(manageAvatar, avatarRules)
-	 .intent(shoppingList, shopping)
-	 .intent(lastAction, backupAction)
-	 .intent(intentEnd, actionEnd)  // Toujours à la fin, controle si une règle est passée
-}
-```
-
 
 ## Configuration
-
-**Important:** Copiez le fichier modules wtf_wikipedia/src/index.js depuis Avatar Serveur V 0.1.3 (17-04-2017) et + 
-
 La configuration du plugin se fait dans le fichier `Avatar-Serveur/plugins/wikipedia/wikipedia.prop`
 
 ### Longueur des tts
@@ -125,6 +57,9 @@ Toutes ces réponses sont définies dans le fichier de propriétés du plugin. V
 
    
 ## Versions
+Version 1.4 (03-11-2017)
+- Les fichiers intent et action déplacés dans le répertoire du plugin. Chargés automatiquement (Avatar serveur 0.1.5)
+
 Version 1.3 (22-04-2017)
 - Petite mise à jour, amélioration de la recherche
 
